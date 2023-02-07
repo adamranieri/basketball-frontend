@@ -47,3 +47,34 @@ export async function createPlayer(basketballPlayer: BasketballPlayerCreation):P
     return player;
 }
 
+export async function getAllPlayersByLastName(lname:string):Promise<BasketballPlayer[]>{
+
+    const query = `query PlayersByLname($lnameToSearch:String){
+        players(lname:$lnameToSearch){
+          playerId
+          fname
+          lname
+          bioMetrics{
+            heightInches
+            weightLbs
+            }
+          careerStats{
+            assists
+            blocks
+            madeBaskets
+            shotAttempts
+            rebounds
+          }
+        }
+        
+      }`
+
+    const variables = {lnameToSearch:lname}
+    const body = JSON.stringify({query:query,variables:variables})
+
+    const httpResponse = await fetch("http://127.0.0.1:8000/graphql", {method:"POST", body, headers:{"Content-Type":"application/json"}});
+    const responseBody = await httpResponse.json();
+    const players:BasketballPlayer[] = responseBody.data;
+    return players
+}
+
